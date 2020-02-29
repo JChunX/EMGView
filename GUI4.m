@@ -22,7 +22,7 @@ function varargout = GUI4(varargin)
 
 % Edit the above text to modify the response to help GUI4
 
-% Last Modified by GUIDE v2.5 21-Feb-2020 17:21:45
+% Last Modified by GUIDE v2.5 28-Feb-2020 18:36:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -89,6 +89,8 @@ function GUI4_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.trialType = 'index_flexion'; % Default experiment type
     handles.runType = 'offLine'; 
     handles.window = 0;
+    handles.gridselectfigure = 0;
+    
     guidata(hObject, handles);
 
 % UIWAIT makes GUI4 wait for user response (see UIRESUME)
@@ -348,12 +350,12 @@ function update_display(hObject,eventdata,hfigure)
     end
 
 function handles = toggleChannels(hObject, eventdata, handles)
-
     channels = {handles.chPlot(1:64);handles.chPlot(65:128);...
                 handles.chPlot(129:192);handles.chPlot(193:256)};
     channels(~handles.toPlot) = {logical(zeros(64,1))};
     channels(handles.toPlot) = {logical(ones(64,1))};
     handles.chPlot = cell2mat(channels);
+    handles.nChPlot = sum(handles.chPlot(:)==1);
     
 % --- Outputs from this function are returned to the command line.
 function varargout = GUI4_OutputFcn(hObject, eventdata, handles) 
@@ -425,24 +427,25 @@ end
 
 
 % --- Executes on button press in in1234button.
-function in1234button_Callback(hObject, eventdata, handles)
+function handles = in1234button_Callback(hObject, eventdata, handles)
 % hObject    handle to in1234button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    state = get(hObject,'Value');
-    if ~(isequal(handles.toPlot,boolean([0,0,0,1])) && handles.plotAux == 0)
+    state = get(hObject,'Value');   
+    
+    if ~(isequal(handles.toPlot,boolean([0,0,0,1])) && ~handles.plotAux)
         pause(0.1)
-        if handles.toPlot(4) == 1
+        if handles.toPlot(4)
             handles.toPlot(4) = 0;
         else 
             handles.toPlot(4) = 1;
         end
         
         handles = toggleChannels(hObject,eventdata,handles);
-        if isfield(handles,'gridselectfigure') 
+        if isgraphics(handles.gridselectfigure) && handles.gridselectfigure ~= 0 
             gridselectbutton_Callback(hObject,eventdata,handles)
         end
-        handles.nChPlot = sum(handles.toPlot)*64;
+        %handles.nChPlot = sum(handles.toPlot)*64;
         handles = potentialsinit(hObject,handles);
         guidata(hObject,handles)
     else
@@ -454,24 +457,25 @@ function in1234button_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in m1button.
-function m1button_Callback(hObject, eventdata, handles)
+function handles = m1button_Callback(hObject, eventdata, handles)
 % hObject    handle to m1button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    state = get(hObject,'Value');
-    if ~(isequal(handles.toPlot,boolean([0,0,1,0])) && handles.plotAux == 0)
+    state = get(hObject,'Value');   
+    
+    if ~(isequal(handles.toPlot,boolean([0,0,1,0])) && ~handles.plotAux)
         pause(0.1)
-        if handles.toPlot(3) == 1
+        if handles.toPlot(3)
             handles.toPlot(3) = 0;
         else 
             handles.toPlot(3) = 1;
         end
         
         handles = toggleChannels(hObject,eventdata,handles);
-        if isfield(handles,'gridselectfigure') 
+        if isgraphics(handles.gridselectfigure) && handles.gridselectfigure ~= 0  
             gridselectbutton_Callback(hObject,eventdata,handles)
         end
-        handles.nChPlot = sum(handles.toPlot)*64;
+        %handles.nChPlot = sum(handles.toPlot)*64;
         handles = potentialsinit(hObject,handles);
         guidata(hObject,handles)
     else
@@ -484,24 +488,25 @@ function m1button_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in m3button.
-function m3button_Callback(hObject, eventdata, handles)
+function handles = m3button_Callback(hObject, eventdata, handles)
 % hObject    handle to m3button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    state = get(hObject,'Value');
-    if ~(isequal(handles.toPlot,boolean([1,0,0,0])) && handles.plotAux == 0)
+    state = get(hObject,'Value');   
+    
+    if ~(isequal(handles.toPlot,boolean([1,0,0,0])) && ~handles.plotAux)
         pause(0.1)
-        if handles.toPlot(1) == 1
+        if handles.toPlot(1)
             handles.toPlot(1) = 0;
         else 
             handles.toPlot(1) = 1;
         end
         
         handles = toggleChannels(hObject,eventdata,handles);
-        if isfield(handles,'gridselectfigure') 
+        if isgraphics(handles.gridselectfigure) && handles.gridselectfigure ~= 0  
             gridselectbutton_Callback(hObject,eventdata,handles)
         end
-        handles.nChPlot = sum(handles.toPlot)*64;
+        %handles.nChPlot = sum(handles.toPlot)*64;
         handles = potentialsinit(hObject,handles);
         guidata(hObject,handles)    
     else
@@ -514,12 +519,13 @@ function m3button_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in m2button.
-function m2button_Callback(hObject, eventdata, handles)
+function handles = m2button_Callback(hObject, eventdata, handles)
 % hObject    handle to m2button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     state = get(hObject,'Value');
-    if ~(isequal(handles.toPlot,boolean([0,1,0,0])) && handles.plotAux == 0)
+        
+    if ~(isequal(handles.toPlot,boolean([0,1,0,0])) && ~handles.plotAux)
         pause(0.1)
         if handles.toPlot(2) == 1
             handles.toPlot(2) = 0;
@@ -528,10 +534,10 @@ function m2button_Callback(hObject, eventdata, handles)
         end
         
         handles = toggleChannels(hObject,eventdata,handles);
-        if isfield(handles,'gridselectfigure') 
+        if isgraphics(handles.gridselectfigure) && handles.gridselectfigure ~= 0 
             gridselectbutton_Callback(hObject,eventdata,handles)
         end
-        handles.nChPlot = sum(handles.toPlot)*64;
+        %handles.nChPlot = sum(handles.toPlot)*64;
         handles = potentialsinit(hObject,handles);
         guidata(hObject,handles)
     else
@@ -625,7 +631,7 @@ function recordstopbutton_Callback(hObject, eventdata, handles)
         visualizestopbutton_Callback(hObject,eventdata,handles)
         disp(size(handles.D))
         guidata(hObject,handles);
-        outData = handles.D;
+        Sig = handles.D;
         fRead = handles.fRead;
         cwd = pwd;
         
@@ -636,7 +642,7 @@ function recordstopbutton_Callback(hObject, eventdata, handles)
         if handles.savepath ~= 0
         disp(handles.savepath)
         cd(handles.savepath)
-        uisave({'outData','fRead'},handles.trialType)
+        uisave({'Sig','fRead'},handles.trialType)
         cd(cwd)
         end
     end
@@ -895,11 +901,12 @@ end
 edit6_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in auxbutton.
-function auxbutton_Callback(hObject, eventdata, handles)
+function handles = auxbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to auxbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     state = get(hObject,'Value');
+
     if isequal(handles.toPlot,boolean([0,0,0,0])) && handles.plotAux == 1
         if state == 0
             set(handles.auxbutton,'Value',1);
@@ -994,7 +1001,7 @@ function realtimecontrolbutton_Callback(hObject, eventdata, handles)
     else
         set([handles.trainmodelbutton,handles.offlinedecompbutton],'visible','on')
         handles.runType = 'visualization';
-    end
+    end 
     
     guidata(hObject,handles)
 % Hint: get(hObject,'Value') returns toggle state of realtimecontrolbutton
@@ -1009,10 +1016,38 @@ function offlinedecompbutton_Callback(hObject, eventdata, handles)
 
     if state == 1
         disp('Offline Decomposition')
-        set([handles.realtimecontrolbutton,handles.trainmodelbutton],'visible','off')
+        set([handles.realtimecontrolbutton,handles.trainmodelbutton,...
+             handles.in1234button,handles.m1button,handles.m2button,...
+             handles.m3button,handles.auxbutton,handles.visualizebutton],'visible','off')
         handles.runType = 'offLineDecomp';
+        
+        [files,path] = uigetfile('*.mat','Multiselect','on');
+        if iscell(files)
+            handles.recordingPaths = cellfun(@(x) fullfile(path,x),files,'UniformOutput',false);
+        else
+            handles.recordingPaths = {fullfile(path,files)};
+        end
+        
+        fileLength = length(handles.recordingPaths);
+        
+        handles.S = cell(1,fileLength);
+        handles.Bout = cell(1,fileLength);
+        handles.SpikeTrain = cell(1,fileLength);
+        handles.SIL = cell(1,fileLength);
+        
+        for i = 1:length(handles.recordingPaths)
+            signal = load(handles.recordingPaths{i},'Sig');
+            signal = signal.Sig;
+            [handles.S{i},handles.Bout{i},handles.SpikeTrain{i},handles.SIL{i}] = ...
+                zy_OfflineDecomp(signal,handles.fSample,8,150,0.7);
+        end
+        
+        set(handles.offlinedecompbutton,'Value',0)
+        offlinedecompbutton_Callback(hObject,eventdata,handles)
     else
-        set([handles.realtimecontrolbutton,handles.trainmodelbutton],'visible','on')
+        set([handles.realtimecontrolbutton,handles.trainmodelbutton,...
+             handles.in1234button,handles.m1button,handles.m2button,...
+             handles.m3button,handles.auxbutton,handles.visualizebutton],'visible','on')
         handles.runType = 'visualization';
     end
     
@@ -1026,25 +1061,21 @@ function gridselectbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
         % Create figure for selecting channel view on grid
-    if ~isfield(handles,'gridselectfigure') 
+
+    if ~isgraphics(handles.gridselectfigure) || handles.gridselectfigure == 0
         handles.gridselectfigure = figure('Name','Select Channels to Plot','NumberTitle','off');
     end
+
     % Create 1 uipanel per EMG pad
     p1 = uipanel(handles.gridselectfigure,'Position',[0.5,0,0.5,0.45]);
     p2 = uipanel(handles.gridselectfigure,'Position',[0,0,0.5,0.45]);
     p3 = uipanel(handles.gridselectfigure,'Position',[0.5,0.45,0.5,0.45]);  
     p4 = uipanel(handles.gridselectfigure,'Position',[0,0.45,0.5,0.45]);
-    pt = uipanel(handles.gridselectfigure,'Position',[0,0.9,1,0.1]);
     
     pos  = [0, 0, 0.1, 0.1];  % [X, Y, Width, Height]
     button_group = cell(handles.nCh-16,1);  
    
     ch = 1;
-    
-    inverse_button = uicontrol(pt,'Style','PushButton',...
-                                'Units','Normalized','Position',[0,0.5,0.2,0.5],...
-                                'String','Toggle All',...
-                                'Callback',{@gridselect_Callback,handles});
     
     % Create buttons for each pad
     for i1 = 1:8
@@ -1121,33 +1152,76 @@ function gridselect_Callback(hObject,eventdata,handles)
     % Adjust chPlot based on button presses
     
     arg = get(hObject,'String');
-    
-    if ~(isempty(str2num(arg)))
-        ch = str2num(arg);
+   
+    ch = str2num(arg);
 
-        if handles.chPlot(ch)
-            handles.chPlot(ch) = 0;
-        else
-            handles.chPlot(ch) = 1;
-        end
-    end
-        
-    if (strcmp(arg,'Toggle All'))
-        nPlotting = size(find(handles.chPlot == 1));
-        nPlotting = nPlotting(1);
-        if  nPlotting > handles.nChPlot/2
-            handles.chPlot(:) = 0; 
-            if handles.plotAux == 0
-                set(handles.auxbutton,'Value',1)
-                auxbutton_Callback(hObject,eventdata,handles)
-            end
-        else
-            handles.chPlot(:) = 1;
-        end
+    if handles.chPlot(ch)
+        handles.chPlot(ch) = 0;
+    else
+        handles.chPlot(ch) = 1;
     end
 
-    guidata(handles.gridselectfigure,handles)
     gridselectbutton_Callback(hObject,eventdata,handles)
 
-    
-        
+% --- Executes on button press in toggleallbutton.
+function toggleallbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to toggleallbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    nPlotting = length(find(handles.chPlot == 1));
+
+    if  nPlotting > (handles.nCh-16)/2
+        handles.chPlot(:) = 0; 
+
+        if ~handles.plotAux
+            handles = auxbutton_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(4)
+            handles = in1234button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(3)
+            handles = m1button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(2)
+            handles = m2button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(1)
+            handles = m3button_Callback(hObject,eventdata,handles);
+        end
+
+        set([handles.in1234button,handles.m1button,handles.m2button,...
+            handles.m3button],'Value',0)
+        set(handles.auxbutton,'Value',1)
+
+        guidata(hObject,handles)
+
+    else
+        handles.chPlot(:) = 1;
+        if handles.toPlot(4) == 0
+            handles = in1234button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(3) == 0
+            handles = m1button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(2) == 0
+            handles = m2button_Callback(hObject,eventdata,handles);
+        end
+
+        if handles.toPlot(1) == 0
+            handles = m3button_Callback(hObject,eventdata,handles);
+        end
+
+        set([handles.in1234button,handles.m1button,handles.m2button,...
+            handles.m3button],'Value',1)
+
+        guidata(hObject,handles)
+    end
+
+    guidata(hObject,handles)
